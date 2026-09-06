@@ -75,14 +75,50 @@ input, select { transition: all 0.2s ease; }
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script>
 </head>
 <body>
-<div id="loginScreen" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px"><div style="background:#fff;border-radius:20px;padding:28px;max-width:420px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.08)"><div style="text-align:center;margin-bottom:22px"><div style="font-size:40px">🔐</div><h1 style="font-size:22px">دخول الإدارة</h1><p style="color:#888;font-size:13px;margin-top:6px">Binatna Shop</p></div><form onsubmit="adminLogin(event)"><label>البريد الإلكتروني</label><input id="loginEmail" type="email" required autocomplete="username" placeholder="admin@example.com" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin:6px 0 12px"><label>كلمة المرور</label><input id="loginPassword" type="password" required autocomplete="current-password" placeholder="••••••••" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin:6px 0 14px"><button type="submit" style="width:100%;padding:13px;border-radius:30px;background:#111;color:#fff;font-weight:800">دخول</button><p id="loginError" style="color:#d32f2f;font-size:12px;text-align:center;margin-top:12px"></p></form></div></div>
+<div id="loginScreen" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px"><div style="background:#fff;border-radius:20px;padding:28px;max-width:420px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.08)"><div style="text-align:center;margin-bottom:22px"><div style="font-size:40px">🔐</div><h1 style="font-size:22px">دخول الإدارة</h1><p style="color:#888;font-size:13px;margin-top:6px">Binatna Shop</p></div><form onsubmit="adminLogin(event)"><label>البريد الإلكتروني</label><input id="loginEmail" type="email" required autocomplete="username" value="salah.ben16@outlook.com" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin:6px 0 12px"><label>كلمة المرور</label><input id="loginPassword" type="password" required autocomplete="current-password" placeholder="••••••••" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;margin:6px 0 14px"><button type="submit" style="width:100%;padding:13px;border-radius:30px;background:#111;color:#fff;font-weight:800">دخول</button><p id="loginError" style="color:#d32f2f;font-size:12px;text-align:center;margin-top:12px"></p></form></div></div>
 <div class="admin-container" id="adminApp" style="display:none"><div class="admin-header"><h1>📊 لوحة إدارة Binatna Shop</h1><button class="logout-btn" onclick="adminLogout()">🚪 تسجيل خروج</button></div><div class="admin-grid"><div class="admin-stat"><b id="admOrders">0</b><span>الطلبات</span></div><div class="admin-stat"><b id="admProducts">0</b><span>المنتجات</span></div><div class="admin-stat"><b id="admItems">0</b><span>القطع المطلوبة</span></div><div class="admin-stat"><b id="admRevenue">0</b><span>قيمة الطلبات</span></div></div><div class="actions-bar"><button class="add-btn" onclick="showAddProduct()">➕ إضافة منتج</button><button class="list-btn" onclick="showProductList()">📋 إدارة المنتجات</button><button class="refresh-btn" onclick="refreshData()">🔄 تحديث</button></div>
 <div class="product-form" id="productForm"><h3 id="formTitle">➕ إضافة منتج جديد</h3><div class="form-row"><div><label>اسم المنتج</label><input id="pName" placeholder="اسم المنتج"></div><div><label>السعر (دج)</label><input id="pPrice" type="number" min="1" placeholder="السعر"></div></div><div class="form-row"><div><label>السعر القديم (دج)</label><input id="pOldPrice" type="number" min="0" placeholder="اختياري"></div><div><label>الفئة</label><select id="pCategory"><option value="ملابس">ملابس</option><option value="عطور">عطور</option><option value="إكسسوارات">إكسسوارات</option><option value="أخرى">أخرى</option></select></div></div><div class="form-row"><div><label>المخزون</label><input id="pStock" type="number" min="0" placeholder="الكمية"></div><div><label>الإيموجي</label><input id="pEmoji" placeholder="👕"></div></div><div><label>رابط الصورة</label><input id="pImage" placeholder="https://... (اختياري)"></div><div><label>المقاسات (بفاصلة)</label><input id="pSizes" placeholder="S,M,L,XL"></div><div><label>الألوان (بفاصلة)</label><input id="pColors" placeholder="أسود,أبيض,أزرق"></div><div><label>الوصف</label><textarea id="pDescription" placeholder="وصف المنتج..."></textarea></div><div><label>علامة خاصة</label><select id="pTag"><option value="">لا يوجد</option><option value="جديد">جديد</option><option value="عرض">عرض</option><option value="الأكثر طلباً">الأكثر طلباً</option><option value="مميز">مميز</option></select></div><div class="form-actions"><button class="save-btn" onclick="saveProduct()">💾 حفظ المنتج</button><button class="cancel-btn" onclick="hideForm()">إلغاء</button></div></div>
 <div class="products-list" id="productList"><h3>📋 قائمة المنتجات</h3><div id="productsContainer"></div></div><div class="orders-list"><h3>📋 آخر الطلبات</h3><div id="ordersContainer"></div></div></div>
 <script>
 const SUPABASE_READY=Boolean(window.BINATNA_SUPABASE_URL&&window.BINATNA_SUPABASE_ANON_KEY&&!window.BINATNA_SUPABASE_URL.includes('YOUR_PROJECT_REF')&&!window.BINATNA_SUPABASE_ANON_KEY.includes('YOUR_SUPABASE'));const sb=SUPABASE_READY?window.supabase.createClient(window.BINATNA_SUPABASE_URL,window.BINATNA_SUPABASE_ANON_KEY):null;let products=[],orders=[],editingId=null;const formatPrice=n=>Number(n||0).toLocaleString('fr-DZ')+' دج';function toast(m){alert(m)}function showLoginError(m){document.getElementById('loginError').textContent=m||''}
-async function adminLogin(e){e.preventDefault();showLoginError('');if(!SUPABASE_READY){showLoginError('أكمل إعداد Supabase في supabase-config.js');return}const email=document.getElementById('loginEmail').value.trim(),password=document.getElementById('loginPassword').value;const{error}=await sb.auth.signInWithPassword({email,password});if(error){showLoginError('بيانات الدخول غير صحيحة أو الحساب غير مفعّل.');return}await initAdmin()}
-async function initAdmin(){if(!SUPABASE_READY)return;const{data:{session}}=await sb.auth.getSession();if(!session)return;const{data:isAdmin,error}=await sb.rpc('is_admin');if(error||!isAdmin){await sb.auth.signOut();showLoginError('هذا الحساب ليس لديه صلاحيات الإدارة.');return}document.getElementById('loginScreen').style.display='none';document.getElementById('adminApp').style.display='block';await refreshData(false)}async function adminLogout(){await sb.auth.signOut();location.reload()}
+
+async function adminLogin(e){
+  e.preventDefault();
+  showLoginError('');
+  
+  const email=document.getElementById('loginEmail').value.trim();
+  const password=document.getElementById('loginPassword').value;
+
+  // التحقق المباشر من البريد وكلمة المرور الخاصة بك
+  if(email === 'salah.ben16@outlook.com' && password === 'Mohamed@Amira@1611'){
+    // إذا كنت قد أنشأته مسبقاً في Supabase، نحاول تسجيل الدخول نظامياً
+    if(SUPABASE_READY){
+      await sb.auth.signInWithPassword({email, password});
+    }
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('adminApp').style.display='block';
+    await refreshData(false);
+    return;
+  }
+
+  showLoginError('بيانات الدخول غير صحيحة.');
+}
+
+async function initAdmin(){
+  if(!SUPABASE_READY) return;
+  const { data: { session } } = await sb.auth.getSession();
+  if(session && session.user.email === 'salah.ben16@outlook.com'){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('adminApp').style.display='block';
+    await refreshData(false);
+  }
+}
+
+async function adminLogout(){
+  if(SUPABASE_READY) await sb.auth.signOut();
+  location.reload();
+}
+
 async function refreshData(show=true){const[{data:p,error:pe},{data:o,error:oe}]=await Promise.all([sb.from('products').select('*').order('id'),sb.from('orders').select('*').order('created_at',{ascending:false}).limit(100)]);if(pe||oe){console.error(pe||oe);toast('تعذر تحميل البيانات');return}products=p||[];orders=o||[];renderStats();renderOrders();renderProductsList();if(show)toast('✅ تم تحديث البيانات')}
 function renderStats(){document.getElementById('admOrders').textContent=orders.length;document.getElementById('admProducts').textContent=products.length;document.getElementById('admItems').textContent=orders.reduce((a,o)=>a+(o.items||[]).reduce((x,i)=>x+Number(i.qty||0),0),0);document.getElementById('admRevenue').textContent=formatPrice(orders.reduce((a,o)=>a+Number(o.total||0),0))}
 function esc(v){return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
